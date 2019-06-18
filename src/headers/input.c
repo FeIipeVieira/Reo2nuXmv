@@ -18,9 +18,12 @@ struct Automato *createSync(char *ports, int nAuto)
     i++;
     while (ports[i] != ')')
     {
-        port2[j] = ports[i];
+        if (ports[i] != ' ')
+        {
+            port2[j] = ports[i];
+            j++;
+        }
         i++;
-        j++;
     }
     struct State *state1 = newState("q0", 1);
     char *condition = (char *)malloc(600 * sizeof(char));
@@ -58,9 +61,12 @@ struct Automato *createLossy(char *ports, int nAuto)
     i++;
     while (ports[i] != ')')
     {
-        port2[j] = ports[i];
+        if (ports[i] != ' ')
+        {
+            port2[j] = ports[i];
+            j++;
+        }
         i++;
-        j++;
     }
     struct State *state1 = newState("q0", 1);
     char *condition = (char *)malloc(600 * sizeof(char));
@@ -109,9 +115,12 @@ struct Automato *createFifo(char *ports, int nAuto)
     i++;
     while (ports[i] != ')')
     {
-        port2[j] = ports[i];
+        if (ports[i] != ' ')
+        {
+            port2[j] = ports[i];
+            j++;
+        }
         i++;
-        j++;
     }
     struct State *state1 = newState("q0", 1);
     struct State *state2 = newState("p0", 0);
@@ -188,9 +197,12 @@ struct Automato *createSyncDrain(char *ports, int nAuto)
     i++;
     while (ports[i] != ')')
     {
-        port2[j] = ports[i];
+        if (ports[i] != ' ')
+        {
+            port2[j] = ports[i];
+            j++;
+        }
         i++;
-        j++;
     }
     struct State *state1 = newState("q0", 1);
     char *condition = (char *)malloc(600 * sizeof(char));
@@ -228,9 +240,12 @@ struct Automato *createAsync(char *ports, int nAuto)
     i++;
     while (ports[i] != ')')
     {
-        port2[j] = ports[i];
+        if (ports[i] != ' ')
+        {
+            port2[j] = ports[i];
+            j++;
+        }
         i++;
-        j++;
     }
     struct State *state1 = newState("q0", 1);
     char *condition = (char *)malloc(600 * sizeof(char));
@@ -279,19 +294,25 @@ struct Automato *createMerger(char *ports, int nAuto)
         i++;
     }
     i++;
-    while (ports[i] != ',')
+    while (ports[i] != ')')
     {
-        port2[j] = ports[i];
+        if (ports[i] != ' ')
+        {
+            port2[j] = ports[i];
+            j++;
+        }
         i++;
-        j++;
     }
     i++;
     j = 0;
     while (ports[i] != ')')
     {
-        port3[j] = ports[i];
+        if (ports[i] != ' ')
+        {
+            port3[j] = ports[i];
+            j++;
+        }
         i++;
-        j++;
     }
     struct State *state1 = newState("q0", 1);
     char *condition = (char *)malloc(600 * sizeof(char));
@@ -342,19 +363,25 @@ struct Automato *createReplicator(char *ports, int nAuto)
         i++;
     }
     i++;
-    while (ports[i] != ',')
+    while (ports[i] != ')')
     {
-        port2[j] = ports[i];
+        if (ports[i] != ' ')
+        {
+            port2[j] = ports[i];
+            j++;
+        }
         i++;
-        j++;
     }
     i++;
     j = 0;
     while (ports[i] != ')')
     {
-        port3[j] = ports[i];
+        if (ports[i] != ' ')
+        {
+            port3[j] = ports[i];
+            j++;
+        }
         i++;
-        j++;
     }
     struct State *state1 = newState("q0", 1);
     char *condition = (char *)malloc(600 * sizeof(char));
@@ -383,26 +410,31 @@ readInput(FILE *f)
 {
     struct AutomatoList *automatoList = NULL;
     struct Automato *temp = NULL;
-    char line[128];
-    char command[128];
-    char ports[128];
+    char line[1024];
+    char command[1024];
+    char ports[1024];
     int i = 0;
     int j = 0;
     int nAuto = 0;
+    memset(line, '\0', sizeof(line));
     while (fgets(line, sizeof line, f) != NULL)
     {
         i = 0;
         j = 0;
-        nAuto++;
-        memset(command, 0, sizeof(command));
-        memset(ports, 0, sizeof(ports));
-        while (line[i] != '(')
+        memset(command, '\0', sizeof(command));
+        memset(ports, '\0', sizeof(ports));
+        while (line[i] != '(' && line[i] != '\n' && line[i] != '\0' && line[i] != '/')
         {
-            command[i] = line[i];
+            if (line[i] != '\t')
+            {
+                command[j] = line[i];
+                j++;
+            }
             i++;
         }
         i++;
-        while ((line[i] != '\n') && (line[i] != '\0'))
+        j = 0;
+        while ((line[i] != '\n') && (line[i] != '\0') && line[i] != '/')
         {
             ports[j] = line[i];
             i++;
@@ -410,39 +442,47 @@ readInput(FILE *f)
         }
         if (strcmp(command, "sync") == 0)
         {
+            nAuto++;
             temp = createSync(ports, nAuto);
             automatoList = addAutomato(automatoList, temp);
         }
         if (strcmp(command, "lossySync") == 0)
         {
+            nAuto++;
             temp = createLossy(ports, nAuto);
             automatoList = addAutomato(automatoList, temp);
         }
         if (strcmp(command, "fifo") == 0)
         {
+            nAuto++;
             temp = createFifo(ports, nAuto);
             automatoList = addAutomato(automatoList, temp);
         }
         if (strcmp(command, "syncDrain") == 0)
         {
+            nAuto++;
             temp = createSyncDrain(ports, nAuto);
             automatoList = addAutomato(automatoList, temp);
         }
         if (strcmp(command, "asyncDrain") == 0)
         {
+            nAuto++;
             temp = createAsync(ports, nAuto);
             automatoList = addAutomato(automatoList, temp);
         }
         if (strcmp(command, "merger") == 0)
         {
+            nAuto++;
             temp = createMerger(ports, nAuto);
             automatoList = addAutomato(automatoList, temp);
         }
         if (strcmp(command, "replicator") == 0)
         {
+            nAuto++;
             temp = createReplicator(ports, nAuto);
             automatoList = addAutomato(automatoList, temp);
         }
+        memset(line, '\0', sizeof(line));
     }
     return automatoList;
 }
