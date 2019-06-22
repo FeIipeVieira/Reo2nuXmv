@@ -207,7 +207,7 @@ struct StringList *addString(struct StringList *stringlist, char *string)
     if (stringlist == NULL)
     {
         stringlist = (struct StringList *)malloc(sizeof(struct StringList));
-        stringlist->string = (char *)malloc(1205 * sizeof(char));
+        stringlist->string = (char *)malloc((strlen(string) + 1) * sizeof(char));
         strcpy(stringlist->string, string);
         stringlist->nextString = NULL;
         return stringlist;
@@ -216,7 +216,7 @@ struct StringList *addString(struct StringList *stringlist, char *string)
     while (tempString->nextString != NULL)
         tempString = tempString->nextString;
     tempString->nextString = (struct StringList *)malloc(sizeof(struct StringList));
-    tempString->nextString->string = (char *)malloc(1205 * sizeof(char));
+    tempString->nextString->string = (char *)malloc((strlen(string) + 1) * sizeof(char));
     strcpy(tempString->nextString->string, string);
     tempString->nextString->nextString = NULL;
     return stringlist;
@@ -266,7 +266,7 @@ struct StringList *cpyStringList(struct StringList *newList, struct StringList *
     if (stringList == NULL)
         return NULL;
     newList = (struct StringList *)malloc(sizeof(struct StringList));
-    newList->string = (char *)malloc(600 * sizeof(char));
+    newList->string = (char *)malloc((strlen(stringList->string) + 1) * sizeof(char));
     strcpy(newList->string, stringList->string);
     newList->nextString = cpyStringList(newList->nextString, stringList->nextString);
     return newList;
@@ -404,6 +404,14 @@ int listLength(struct StringList *list)
 
 void printsList(struct StringList *list)
 {
+    if (list == NULL)
+    {
+        printf("Empty list\n");
+    }
+    else
+    {
+        printf("----------List---------\n");
+    }
     while (list != NULL)
     {
         printf("%s\n", list->string);

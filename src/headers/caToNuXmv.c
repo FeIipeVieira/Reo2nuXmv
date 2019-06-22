@@ -58,6 +58,7 @@ void caToNuxmv(struct Automato *automato, struct StringList *ports, FILE *f)
     while (states != NULL)
     {
         transitions = states->state->transitions;
+        delStringList(tempStatesNames);
         tempStatesNames = cpyStringList(tempStatesNames, statesNames);
         tempStatesNames = delString(tempStatesNames, states->state->name);
         while (transitions != NULL)
@@ -98,7 +99,7 @@ void caToNuxmv(struct Automato *automato, struct StringList *ports, FILE *f)
 struct StringList *portsIntersection(struct Transition *transition, struct Automato *automato)
 {
     struct StringList *list = NULL;
-    char *concat = (char *)malloc(600 * sizeof(char));
+    char *concat = (char *)malloc(800 * sizeof(char));
     struct StringList *ports = transition->ports;
     struct StringList *portsAutomato = automato->ports;
     while (ports != NULL)
@@ -346,6 +347,8 @@ void portsToNuXmv(FILE *f, struct StringList *ports)
         randomPort(f, tempPorts->string, timeMax);
         tempPorts = tempPorts->nextString;
     }
+    delStringList(tempPorts);
+    tempPorts = NULL;
 }
 
 void printaAutomatoFinal(struct Automato *automato)
@@ -385,7 +388,7 @@ struct AutomatoProdList *productInSmv(struct AutomatoList *automatos, struct Str
 {
     struct Automato *automato1 = automatos->automato;
     struct Automato *automato2;
-    char *concat = (char *)malloc(600 * sizeof(char));
+    char *concat = (char *)malloc(800 * sizeof(char));
     char *tempCondition = NULL;
     char *transString = (char *)malloc(1200 * sizeof(char));
     struct StringList *intersection1 = NULL;
@@ -423,8 +426,8 @@ struct AutomatoProdList *productInSmv(struct AutomatoList *automatos, struct Str
         automatoPorts = unionStringList(automato1->ports, automato2->ports);
         delStringList(states);
         delStringList(initStates);
-        delStringList(invar);
-        delStringList(trans);
+        // delStringList(invar);
+        // delStringList(trans);
         states = NULL;
         initStates = NULL;
         invar = NULL;
@@ -435,11 +438,11 @@ struct AutomatoProdList *productInSmv(struct AutomatoList *automatos, struct Str
             while (states2 != NULL)
             {
                 init = ((states1->state->init + states2->state->init) == 2 ? 1 : 0);
-                snprintf(concat, 600, "%s%s", states1->state->name, states2->state->name);
+                snprintf(concat, 800, "%s%s", states1->state->name, states2->state->name);
                 states = addString(states, concat);
                 if (init)
                     initStates = addString(initStates, concat);
-                snprintf(transString, 600, "(((prod1.cs = %s) & (prod2.cs = %s)) <-> (cs = %s))", states1->state->name, states2->state->name, concat);
+                snprintf(transString, 1200, "(((prod1.cs = %s) & (prod2.cs = %s)) <-> (cs = %s))", states1->state->name, states2->state->name, concat);
                 invar = addString(invar, transString);
                 states2 = states2->nextState;
                 tempState = newState(concat, init);
@@ -454,12 +457,13 @@ struct AutomatoProdList *productInSmv(struct AutomatoList *automatos, struct Str
             states2 = automato2->states;
             while (states2 != NULL)
             {
-                snprintf(concat, 600, "%s%s", states1->state->name, states2->state->name);
+                snprintf(concat, 800, "%s%s", states1->state->name, states2->state->name);
                 stateStart = findState(tempStates, concat);
                 transitions1 = states1->state->transitions;
-                delStringList(inalcStates);
+                // delStringList(inalcStates);
+                inalcStates = NULL;
                 inalcStates = cpyStringList(inalcStates, states);
-                snprintf(concat, 600, "%s%s", states1->state->name, states2->state->name);
+                snprintf(concat, 800, "%s%s", states1->state->name, states2->state->name);
                 inalcStates = delString(inalcStates, concat);
                 firstPass = 1;
                 while (transitions1 != NULL)
@@ -467,7 +471,7 @@ struct AutomatoProdList *productInSmv(struct AutomatoList *automatos, struct Str
                     intersection1 = portsIntersection(transitions1->transition, automato2);
                     if (intersection1 == NULL)
                     {
-                        snprintf(concat, 600, "%s%s", transitions1->transition->end->name, states2->state->name);
+                        snprintf(concat, 800, "%s%s", transitions1->transition->end->name, states2->state->name);
                         inalcStates = delString(inalcStates, concat);
                         tempState = findState(tempStates, concat);
                         tempTransition = (struct Transition *)malloc(sizeof(struct Transition));
@@ -569,10 +573,10 @@ struct AutomatoProdList *productInSmv(struct AutomatoList *automatos, struct Str
                 }
                 if (inalcStates != NULL)
                 {
-                    snprintf(transString, 600, "((cs = %s%s) -> (", states1->state->name, states2->state->name);
+                    snprintf(transString, 1200, "((cs = %s%s) -> (", states1->state->name, states2->state->name);
                     while (inalcStates != NULL)
                     {
-                        snprintf(concat, 600, "(next(cs) != %s)%s", inalcStates->string, inalcStates->nextString != NULL ? " & " : "))");
+                        snprintf(concat, 800, "(next(cs) != %s)%s", inalcStates->string, inalcStates->nextString != NULL ? " & " : "))");
                         strcat(transString, concat);
                         inalcStates = inalcStates->nextString;
                     }
