@@ -446,25 +446,25 @@ readInput(FILE *f)
             temp = createSync(ports, nAuto);
             automatoList = addAutomato(automatoList, temp);
         }
-        if (strcmp(command, "lossySync") == 0)
+        if (strcmp(command, "lossysync") == 0)
         {
             nAuto++;
             temp = createLossy(ports, nAuto);
             automatoList = addAutomato(automatoList, temp);
         }
-        if (strcmp(command, "fifo") == 0)
+        if (strcmp(command, "fifo1") == 0)
         {
             nAuto++;
             temp = createFifo(ports, nAuto);
             automatoList = addAutomato(automatoList, temp);
         }
-        if (strcmp(command, "syncDrain") == 0)
+        if (strcmp(command, "syncdrain") == 0)
         {
             nAuto++;
             temp = createSyncDrain(ports, nAuto);
             automatoList = addAutomato(automatoList, temp);
         }
-        if (strcmp(command, "asyncDrain") == 0)
+        if (strcmp(command, "syncspout") == 0)
         {
             nAuto++;
             temp = createAsync(ports, nAuto);
